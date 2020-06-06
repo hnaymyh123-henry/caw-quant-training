@@ -94,10 +94,19 @@ class CryptoCompareAPI():
                 f"Can't do start_time={start_time}, end_time={end_time}, limit={limit}")
     
     def get_market_cap(self, limit, page, tsym): #get top list market cap
+         limit = int(limit)
          tsym = tsym.upper()
          baseurl = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit={}&page={}&tsym={}'.format(limit, page, tsym)
-         df_market_cap = pd.DataFrame(self._safeRequest(baseurl))
-         return df_market_cap
+         market_cap = self._safeRequest(baseurl)
+         for i in range(0,limit):
+             if i == 0:
+                df_market_cap_DISPLAY = pd.DataFrame(market_cap[i]['DISPLAY']['USD'],index=[0])
+             else:
+                df_market_cap_DISPLAY2 = pd.DataFrame(market_cap[i]['DISPLAY']['USD'],index=[0])
+                df_market_cap_DISPLAY = pd.concat([df_market_cap_DISPLAY, df_market_cap_DISPLAY2], axis=0)
+         
+        
+         return df_market_cap_DISPLAY
 
 
 
@@ -137,4 +146,5 @@ DATA_DIR = './data'
 #df.to_csv(os.path.join(DATA_DIR, "BTC_USDT_1h.csv"), index=False)
 
 df2 = cc_api.get_market_cap('10','1','USD')
-df2.to_csv('Top_list_market_cap.csv')
+df2.to_csv('market_cap.csv')
+print(df2.head())
